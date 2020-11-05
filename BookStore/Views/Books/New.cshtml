@@ -1,0 +1,24 @@
+﻿@model BookStore.Models.Book
+@{
+    ViewBag.Title = "New";
+}
+<h2>New</h2>
+@using (Html.BeginForm(actionName: "Create", controllerName: "Books", method: FormMethod.Post))
+{
+    @Html.Label("Title", "Book Title:")
+    <br />
+    @Html.TextBoxFor(b => b.Title, null, new { placeholder = "Type in the book's title", @class = "formcontrol" })
+    @Html.ValidationMessageFor(b => b.Title, "", new { @class = "text-danger" })
+    <br />
+    @Html.Label("Author", "Author:")
+    <br />
+    @Html.TextBoxFor(b => b.Author, null, new { placeholder = "Type in the book's author", @class = "formcontrol" })
+    @Html.ValidationMessageFor(b => b.Author, "", new { @class = "text-danger" })
+    <br />
+    @Html.Label("Summary", "Summary:")
+    <br />
+    @Html.TextArea("Summary", null, new { placeholder = "Type in the book's summary", @class = "formcontrol", @rows = "10" })
+    @Html.ValidationMessageFor(b => b.Summary, "", new { @class = "text-danger" })
+    <br />
+    <button class="btn btn-primary" type="submit">Create</button>
+}​​
