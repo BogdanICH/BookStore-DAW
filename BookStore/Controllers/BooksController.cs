@@ -52,6 +52,70 @@ namespace BookStore.Controllers
             return View(book);
         }
 
+        [HttpGet]
+        public ActionResult Edit(int? id)
+        {
+            if (id.HasValue)
+            {
+                Book book = db.Books.Find(id);
+                if (book == null)
+                {
+                    return HttpNotFound("Nu s-a gasit cartea");
+                }
+                return View(book);
+            }
+            return HttpNotFound("Nu ai dat id cartii");
+        }
+
+        [HttpPut]
+        public ActionResult Edit(Book bookRequest)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    Book book = db.Books
+                    .Include("Publisher")
+                    .SingleOrDefault(b => b.BookId.Equals(bookRequest.BookId));
+                    if (TryUpdateModel(book))
+                    {
+                        book.Title = bookRequest.Title;
+                        book.Author = bookRequest.Author;
+                        book.Summary = bookRequest.Summary;
+                        db.SaveChanges();
+                    }
+                    return RedirectToAction("Index");
+                }
+                return View(bookRequest);
+            }
+            catch  (Exception e)
+            {
+                return View(bookRequest);
+            }
+
+        }
+        [HttpGet]
+        public ActionResult Details()
+        {
+            Book book = db.Books 
+            .Include("Publisher")
+            .SingleOrDefault(b => b.BookId.Equals(1));
+            return View(book);            
+        }
+
+        [HttpDelete]
+        public ActionResult Delete(int id)
+        {
+            Book book = db.Books.Find(id);
+            if (book != null)
+            {
+                db.Books.Remove(book);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return HttpNotFound("Nu s-a putut găsi cartea ");
+        }
+
     }
 }
         // TODO: adaugare action Details(int/string id)

@@ -14,12 +14,12 @@
         <br />
 
         <p>@book.Author</p>
-        @using (Html.BeginForm(actionName: "Details", controllerName: "Books", method: FormMethod.Get, routeValues: new { id = book.BookId }))
+        @using (Html.BeginForm(actionName: "Edit", controllerName: "Books", method: FormMethod.Get, routeValues: new { id = book.BookId }))
         {
-            <button class="btn btn-primary">Details</button>
+            <button class="btn btn-primary">Edit</button>
         }
 
     </div>
-}​​
+}
 <!-- salut -->
-@Html.ActionLink("Add book", "New") 
+@Html.ActionLink("Add book", "New")

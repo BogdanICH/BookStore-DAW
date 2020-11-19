@@ -1,0 +1,28 @@
+﻿@model BookStore.Models.Book
+@{
+    ViewBag.Title = "Details";
+}
+
+@using (Html.BeginForm(actionName: "Details", controllerName: "Books"))
+{
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+    @Html.HiddenFor(b => b.BookId)
+    <br />
+    @Html.Label("Title", "Book Title:")
+    <br />
+    @Html.EditorFor(b => b.Title, new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessageFor(b => b.Title, "", new { @class = "text-danger" })
+    <br />
+    @Html.Label("Author", "Author:")
+    <br />
+    @Html.Editor("Author", new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessageFor(b => b.Author, "", new { @class = "text-danger" })
+    <br />
+    @Html.Label("Summary", "Summary:")
+    <br />
+    @Html.TextAreaFor(b => b.Summary, new { @class = "formcontrol", @rows = "10" })
+    @Html.ValidationMessageFor(b => b.Summary, "", new { @class = "text-danger" })
+    <br />
+    <button class="btn btn-primary" type="submit">de schimbat</button>
+}
+@Html.ActionLink("Editeaza", "Edit")
