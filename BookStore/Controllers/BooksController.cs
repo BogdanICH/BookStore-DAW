@@ -1,5 +1,6 @@
 ﻿using BookStore.Data_Access_Layer;
 using BookStore.Models;
+using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,44 +17,54 @@ namespace BookStore.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            try
+            while (true)
             {
-                List<Book> books = db.Books.Include("Publisher").ToList();
-                ViewBag.Books = books;
+                try
+                {
 
+                    List<Book> books = db.Books.Include("Publisher").ToList();
+                    ViewBag.Books = books;
+                    return View();
+                }
+                catch (System.Data.SqlClient.SqlException e)
+                {
+                    HandleConnectionIsOpen(e);
+                }
             }
-            catch (System.Data.SqlClient.SqlException e)
-            {
-                /*
-                   "handle future exception if they appear (super unlikely)"
-                     --Andrei, the newly recruited intern
-               */
-                throw e;
+        }
 
-            }
-            return View();
-
+        private static void HandleConnectionIsOpen(System.Data.SqlClient.SqlException e)
+        {
+            var dbName = e.Message.Split('\"')[1];
+            Server server = new Server(@"(localdb)\MSSQLLocalDB");
+            Database database = new Database(server, dbName);
+            database.Refresh();
+            server.KillAllProcesses(dbName);
+            database.DatabaseOptions.UserAccess = DatabaseUserAccess.Single;
+            //database.Alter(TerminationClause.RollbackTransactionsImmediately);
         }
 
         [HttpPost]
         public ActionResult Create(Book bookRequest)
         {
-            try
+            while (true)
             {
-                if (ModelState.IsValid) // ModelState - model binding corect si nu sunt incalcate reguli de validare
+                try
                 {
-                    bookRequest.Publisher = db.Publisher.FirstOrDefault(p => p.PublisherId.Equals(1)); // de ce e nevoie de populare prop Publisher?
-                    bookRequest.DateCreation = DateTime.Now;
-                    db.Books.Add(bookRequest);
-                    db.SaveChanges();
-                    return RedirectToAction("Index"); // RedirectToAction - redirect catre actiunea Index din acelasi controller
+                    if (ModelState.IsValid) // ModelState - model binding corect si nu sunt incalcate reguli de validare
+                    {
+                        bookRequest.Publisher = db.Publisher.FirstOrDefault(p => p.PublisherId.Equals(1)); // de ce e nevoie de populare prop Publisher?
+                        bookRequest.DateCreation = DateTime.Now;
+                        db.Books.Add(bookRequest);
+                        db.SaveChanges();
+                        return RedirectToAction("Index"); // RedirectToAction - redirect catre actiunea Index din acelasi controller
+                    }
+                    return View(bookRequest);
                 }
-                return View(bookRequest);
-            }
-            catch (Exception e)
-            {
-
-                throw e;
+                catch (System.Data.SqlClient.SqlException e)
+                {
+                    HandleConnectionIsOpen(e);
+                }
             }
             return RedirectToAction("Index");
         }
@@ -86,28 +97,30 @@ namespace BookStore.Controllers
         [HttpPut]
         public ActionResult Edit(Book bookRequest)
         {
-            try
+            while (true)
             {
-                if (ModelState.IsValid)
+                try
                 {
-                    Book book = db.Books
-                    .Include("Publisher")
-                    .SingleOrDefault(b => b.BookId.Equals(bookRequest.BookId));
-                    if (TryUpdateModel(book))
+                    if (ModelState.IsValid)
                     {
-                        book.Title = bookRequest.Title;
-                        book.Author = bookRequest.Author;
-                        book.Summary = bookRequest.Summary;
-                        db.SaveChanges();
+                        Book book = db.Books
+                        .Include("Publisher")
+                        .SingleOrDefault(b => b.BookId.Equals(bookRequest.BookId));
+                        if (TryUpdateModel(book))
+                        {
+                            book.Title = bookRequest.Title;
+                            book.Author = bookRequest.Author;
+                            book.Summary = bookRequest.Summary;
+                            db.SaveChanges();
+                        }
+                        return RedirectToAction("Index");
                     }
-                    return RedirectToAction("Index");
+                    return View(bookRequest);
                 }
-                return View(bookRequest);
-            }
-            catch (Exception e)
-            {
-                throw e;
-                return View(bookRequest);
+                catch (System.Data.SqlClient.SqlException e)
+                {
+                    HandleConnectionIsOpen(e);
+                }
             }
 
         }
