@@ -16,23 +16,9 @@ namespace BookStore.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            try
-            {
-                List<Book> books = db.Books.Include("Publisher").ToList();
-                ViewBag.Books = books;
-
-            }
-            catch (System.Data.SqlClient.SqlException e)
-            {
-                /*
-                   "handle future exception if they appear (super unlikely)"
-                     --Andrei, the newly recruited intern
-               */
-                throw e;
-
-            }
+            List<Book> books = db.Books.Include("Publisher").ToList();
+            ViewBag.Books = books;
             return View();
-
         }
 
         [HttpPost]
@@ -52,10 +38,8 @@ namespace BookStore.Controllers
             }
             catch (Exception e)
             {
-
-                throw e;
+                return View(bookRequest);
             }
-            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -104,9 +88,8 @@ namespace BookStore.Controllers
                 }
                 return View(bookRequest);
             }
-            catch (Exception e)
+            catch  (Exception e)
             {
-                throw e;
                 return View(bookRequest);
             }
 
@@ -114,10 +97,10 @@ namespace BookStore.Controllers
         [HttpGet]
         public ActionResult Details()
         {
-            Book book = db.Books
+            Book book = db.Books 
             .Include("Publisher")
             .SingleOrDefault(b => b.BookId.Equals(1));
-            return View(book);
+            return View(book);            
         }
 
         [HttpDelete]
@@ -135,6 +118,6 @@ namespace BookStore.Controllers
 
     }
 }
-// TODO: adaugare action Details(int/string id)
-// TODO: generare View din acest Action (click dreapta Add View)
-
+        // TODO: adaugare action Details(int/string id)
+        // TODO: generare View din acest Action (click dreapta Add View)
+    
